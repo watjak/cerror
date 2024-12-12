@@ -74,42 +74,6 @@ func (f *StackTraceFilter) Filter(rawStack, format string) string {
 	return formattedStack
 }
 
-func (f *StackTraceFilter) FilterOnlyBasePath(basePath, rawStack, format string) string {
-	lines := strings.Split(rawStack, "\n")
-	filtered := make([]string, 0)
-
-	for i := 0; i < len(lines)-1; i += 2 {
-		function := strings.TrimSpace(lines[i])
-		location := strings.TrimSpace(lines[i+1])
-
-		if f.isInBasePaths(location) && !f.isInExcludePaths(location) {
-			filtered = append(filtered, fmt.Sprintf("%s (%s)", function, location))
-		}
-	}
-
-	re := fmt.Sprintf(`\(.*?%s"`, basePath)
-	rp := fmt.Sprintf("(%s", basePath)
-	newFiltered := []string{}
-	for _, v := range filtered {
-		newFiltered = append(newFiltered, regexp.MustCompile(re).ReplaceAllString(v, rp))
-	}
-
-	formattedStack := ""
-	switch format {
-	case "json":
-		jsonFormat, err := formatToJSON(strings.Join(newFiltered, "\n"))
-		if err != nil {
-			return ""
-		}
-		formattedStack = string(jsonFormat)
-	default:
-		formattedStack = formatPlain(strings.Join(newFiltered, "\n"))
-
-	}
-
-	return formattedStack
-}
-
 func (f *StackTraceFilter) isInBasePaths(location string) bool {
 	for _, pattern := range f.BasePatterns {
 		if pattern.MatchString(location) {
