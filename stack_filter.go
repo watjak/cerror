@@ -87,7 +87,7 @@ func (f *StackTraceFilter) FilterOnlyBasePath(basePath, rawStack, format string)
 		}
 	}
 
-	re := fmt.Sprintf(`\(.*?%s")`, basePath)
+	re := fmt.Sprintf(`\(.*?%s"`, basePath)
 	rp := fmt.Sprintf("(%s", basePath)
 	newFiltered := []string{}
 	for _, v := range filtered {
