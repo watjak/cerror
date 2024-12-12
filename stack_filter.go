@@ -86,9 +86,12 @@ func (f *StackTraceFilter) FilterOnlyBasePath(basePath, rawStack, format string)
 			filtered = append(filtered, fmt.Sprintf("%s (%s)", function, location))
 		}
 	}
-	newFiltered := make([]string, len(filtered))
-	for _, filter := range filtered {
-		newFiltered = append(newFiltered, filter[strings.Index(filter, basePath):])
+
+	re := fmt.Sprintf(`\(.*?%s")`, basePath)
+	rp := fmt.Sprintf("(%s", basePath)
+	newFiltered := []string{}
+	for _, v := range filtered {
+		newFiltered = append(newFiltered, regexp.MustCompile(re).ReplaceAllString(v, rp))
 	}
 
 	formattedStack := ""
